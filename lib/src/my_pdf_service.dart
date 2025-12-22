@@ -2,7 +2,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:open_app_file/open_app_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:universal_html/html.dart' as html;
 
 class MyPdfService {
   static final Dio _dio = Dio();
@@ -51,6 +54,22 @@ class MyPdfService {
       return response.data;
     } else {
       throw Exception("Failed to download PDF from $url");
+    }
+  }
+
+  static Future<void> openMerged(Uint8List bytes, String fileName) async {
+    if (kIsWeb) {
+      final html.Blob blob = html.Blob([bytes], 'application/pdf');
+      final String url = html.Url.createObjectUrlFromBlob(blob);
+
+      html.window.open(url, "_blank");
+
+      Future.delayed(const Duration(minutes: 1), () => html.Url.revokeObjectUrl(url));
+    } else {
+      final Directory directory = await getTemporaryDirectory();
+      final File file = File('${directory.path}/$fileName');
+      await file.writeAsBytes(bytes, flush: true);
+      await OpenAppFile.open(file.path);
     }
   }
 }

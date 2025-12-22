@@ -12,6 +12,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   syncfusion_flutter_pdf: ^32.1.19
+  file_picker: ^10.3.8
+  path_provider: ^2.1.5
   open_app_file: ^4.0.4
   dio: ^5.9.0
   universal_html: ^2.3.0
