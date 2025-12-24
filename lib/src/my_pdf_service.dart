@@ -1,5 +1,5 @@
 /// A library for merging and opening PDF files within a Flutter application.
-library pdf_merger_flutter;
+library;
 
 import 'dart:io';
 import 'package:flutter/services.dart';
