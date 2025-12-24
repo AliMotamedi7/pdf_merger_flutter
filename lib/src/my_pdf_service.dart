@@ -1,16 +1,14 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:open_app_file/open_app_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:universal_html/html.dart' as html;
 
 class MyPdfService {
   static final Dio _dio = Dio();
 
-  static Future<Uint8List> combinePDFs({List<String>? urls, List<String>? localPaths}) async {
+  static Future<Uint8List> combinePDFs({List<String>? urls, List<Uint8List>? localBytes}) async {
     List<Uint8List> allPdfBytes = [];
 
     if (urls != null) {
@@ -19,13 +17,8 @@ class MyPdfService {
       }
     }
 
-    if (!kIsWeb && localPaths != null) {
-      for (var path in localPaths) {
-        final File file = File(path);
-        if (await file.exists()) {
-          allPdfBytes.add(await file.readAsBytes());
-        }
-      }
+    if (localBytes != null) {
+      allPdfBytes.addAll(localBytes);
     }
 
     return await _mergePdfs(allPdfBytes);
@@ -33,19 +26,25 @@ class MyPdfService {
 
   static Future<Uint8List> _mergePdfs(List<Uint8List> pdfBytesList) async {
     PdfDocument newDocument = PdfDocument();
+    PdfSection? section;
+    for (Uint8List byte in pdfBytesList) {
+      PdfDocument loadedDocument = PdfDocument(inputBytes: byte);
+      for (int index = 0; index < loadedDocument.pages.count; index++) {
+        PdfTemplate template = loadedDocument.pages[index].createTemplate();
+        if (section == null || section.pageSettings.size != template.size) {
+          section = newDocument.sections!.add();
+          section.pageSettings.size = template.size;
+          section.pageSettings.margins.all = 0;
+        }
 
-    for (Uint8List bytes in pdfBytesList) {
-      PdfDocument loadedDocument = PdfDocument(inputBytes: bytes);
-      for (int i = 0; i < loadedDocument.pages.count; i++) {
-        PdfTemplate template = loadedDocument.pages[i].createTemplate();
-        newDocument.pages.add().graphics.drawPdfTemplate(template, Offset.zero);
+        section.pages.add().graphics.drawPdfTemplate(template, const Offset(0, 0));
       }
+
       loadedDocument.dispose();
     }
-
-    List<int> mergedBytes = await newDocument.save();
+    List<int> bytes = await newDocument.save();
     newDocument.dispose();
-    return Uint8List.fromList(mergedBytes);
+    return Uint8List.fromList(bytes);
   }
 
   static Future<Uint8List> _fetchUrlBytes(String url) async {
@@ -58,18 +57,9 @@ class MyPdfService {
   }
 
   static Future<void> openMerged(Uint8List bytes, String fileName) async {
-    if (kIsWeb) {
-      final html.Blob blob = html.Blob([bytes], 'application/pdf');
-      final String url = html.Url.createObjectUrlFromBlob(blob);
-
-      html.window.open(url, "_blank");
-
-      Future.delayed(const Duration(minutes: 1), () => html.Url.revokeObjectUrl(url));
-    } else {
-      final Directory directory = await getTemporaryDirectory();
-      final File file = File('${directory.path}/$fileName');
-      await file.writeAsBytes(bytes, flush: true);
-      await OpenAppFile.open(file.path);
-    }
+    final Directory directory = await getTemporaryDirectory();
+    final File file = File('${directory.path}/$fileName');
+    await file.writeAsBytes(bytes, flush: true);
+    await OpenAppFile.open(file.path);
   }
 }

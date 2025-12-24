@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:pdf_merger_flutter/my_pdf_merger.dart';
 
 void main() {
@@ -25,6 +26,11 @@ class PDFMergeScreen extends StatefulWidget {
 class PDFMergeScreenState extends State<PDFMergeScreen> {
   final TextEditingController _fileNameController = TextEditingController();
   final List<String> _pdfUrls = [];
+  final List<String> _pdfUrlsInternet = [
+    'https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf',
+    'https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf',
+  ];
+  final List<Uint8List> _pdfBytesList = [];
   bool _isLoading = false;
 
   Future<void> _combinePDFs() async {
@@ -38,7 +44,7 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
     });
 
     try {
-      final mergedBytes = await MyPdfService.combinePDFs(localPaths: _pdfUrls);
+      final Uint8List mergedBytes = await MyPdfService.combinePDFs(localBytes: _pdfBytesList,urls: _pdfUrlsInternet);
       await MyPdfService.openMerged(mergedBytes, "${_fileNameController.text}.pdf");
     } catch (e) {
       if (context.mounted) {}
@@ -50,10 +56,17 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
   }
 
   void _pickFilesToAdd() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      withData: true,
+    );
 
     if (result != null) {
       setState(() {
+        // if (kIsWeb) {
+          _pdfBytesList.add(result.files.first.bytes!);
+        // }
         _pdfUrls.addAll(result.files.map((file) => file.path!));
       });
     }
