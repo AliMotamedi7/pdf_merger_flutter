@@ -291,10 +291,10 @@ packages:
   pdf_merger_flutter:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
+      path: "/home/amirreza/Documents/Flutter-Projects/pdf_merger_flutter"
+      relative: false
     source: path
-    version: "1.0.0+1"
+    version: "1.0.0+2"
   petitparser:
     dependency: transitive
     description:
