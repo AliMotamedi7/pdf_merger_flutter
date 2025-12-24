@@ -1,6 +1,6 @@
 # pdf_merger_flutter
 
-A new Flutter project.
+A Flutter package that allows developers to easily merge multiple PDF files into a single document with a simple and intuitive API.
 
 ## Getting Started
 
