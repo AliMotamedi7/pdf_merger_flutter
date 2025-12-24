@@ -1,6 +1,6 @@
 name: pdf_merger_flutter
 description: "A Flutter package that allows developers to easily merge multiple PDF files into a single document with a simple and intuitive API."
-version: 1.0.0+2
+version: 1.0.0+3
 repository: https://github.com/AliMotamedi7/pdf_merger_flutter
 
 environment:
