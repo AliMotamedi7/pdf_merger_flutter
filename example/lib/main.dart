@@ -31,7 +31,9 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
 
   Future<void> _combinePDFs() async {
     if (_fileNameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Enter a file name')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Enter a file name')));
       return;
     }
 
@@ -40,8 +42,13 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
     });
 
     try {
-      final Uint8List mergedBytes = await MyPdfService.combinePDFs(localBytes: _pdfBytesList);
-      await MyPdfService.openMerged(mergedBytes, "${_fileNameController.text}.pdf");
+      final Uint8List mergedBytes = await MyPdfService.combinePDFs(
+        localBytes: _pdfBytesList,
+      );
+      await MyPdfService.openMerged(
+        mergedBytes,
+        "${_fileNameController.text}.pdf",
+      );
     } catch (e) {
       if (context.mounted) {}
     } finally {
@@ -61,7 +68,7 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
     if (result != null) {
       setState(() {
         // if (kIsWeb) {
-          _pdfBytesList.add(result.files.first.bytes!);
+        _pdfBytesList.add(result.files.first.bytes!);
         // }
         _pdfUrls.addAll(result.files.map((file) => file.path!));
       });
@@ -82,19 +89,27 @@ class PDFMergeScreenState extends State<PDFMergeScreen> {
                 decoration: InputDecoration(labelText: 'Enter file name'),
               ),
             SizedBox(height: 16),
-            ElevatedButton(onPressed: _pickFilesToAdd, child: Text('Pick PDFs')),
+            ElevatedButton(
+              onPressed: _pickFilesToAdd,
+              child: Text('Pick PDFs'),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: _pdfUrls.length,
                 itemBuilder: (context, index) {
-                  return ListTile(title: Text('PDF ${index + 1}'), subtitle: Text(_pdfUrls[index]));
+                  return ListTile(
+                    title: Text('PDF ${index + 1}'),
+                    subtitle: Text(_pdfUrls[index]),
+                  );
                 },
               ),
             ),
             if (_pdfUrls.length > 1)
               ElevatedButton(
                 onPressed: _combinePDFs,
-                child: _isLoading ? CircularProgressIndicator() : Text('Merge PDFs'),
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : Text('Merge PDFs'),
               ),
           ],
         ),

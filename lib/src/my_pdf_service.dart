@@ -28,7 +28,10 @@ class MyPdfService {
           section.pageSettings.margins.all = 0;
         }
 
-        section.pages.add().graphics.drawPdfTemplate(template, const Offset(0, 0));
+        section.pages.add().graphics.drawPdfTemplate(
+          template,
+          const Offset(0, 0),
+        );
       }
 
       loadedDocument.dispose();
