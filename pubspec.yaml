@@ -1,7 +1,7 @@
 name: pdf_merger_flutter
 description: "A new Flutter project."
-publish_to: 'none'
 version: 1.0.0+1
+repository: https://github.com/AliMotamedi7/pdf_merger_flutter
 
 environment:
   sdk: ^3.10.0
