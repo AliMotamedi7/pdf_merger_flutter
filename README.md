@@ -4,9 +4,7 @@ A new Flutter project.
 
 ## Getting Started
 
-This package is developed for merging multiple files with each other, you can pass url and bytes.
-urls have priority to bytes so if you upload url, the first files are the uploaded urls.
-note that to merge files from url, they would download first and merge.
+This package is developed for merging multiple files with each other, you can pass bytes.
 
 To use this package call [combinePDFs]:
 
